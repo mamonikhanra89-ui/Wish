@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Tribute | Jhantu Mondal Sir</title>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library for Fireworks -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #07101e;
+            --card-bg: rgba(17, 28, 45, 0.85);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --gold-light: #FFE082;
+            --gold-primary: #FFB300;
+            --btn-orange: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            --text-white: #EEF2F6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px 15px;
+        }
+
+        /* Ambient Glowing Canvas Background */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* App Wrapper */
+        .app-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Stage Indicator Pill */
+        .stage-pill {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1.5px solid var(--gold-primary);
+            color: var(--gold-light);
+            padding: 4px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(255, 179, 0, 0.2);
+        }
+
+        /* Glowing Stage Titles */
+        .stage-header {
+            text-align: center;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .title-primary {
+            color: var(--gold-light);
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-shadow: 0 0 12px rgba(255, 224, 130, 0.6);
+            line-height: 1.3;
+            text-transform: uppercase;
+        }
+
+        .title-secondary {
+            color: var(--gold-primary);
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(255, 179, 0, 0.7);
+            margin-top: 4px;
+        }
+
+        /* Main Dark Glass Card */
+        .main-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 30px 24px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .card-heading {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 20px;
+        }
+
+        .card-text {
+            font-size: 1.02rem;
+            line-height: 1.7;
+            color: rgba(238, 242, 246, 0.92);
+            font-weight: 400;
+        }
+
+        .card-text p {
+            margin-bottom: 16px;
+        }
+
+        .card-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Student Signature Box for Stage 5 */
+        .signature-box {
+            border: 1.5px dashed var(--gold-primary);
+            background: rgba(255, 179, 0, 0.05);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .signature-title {
+            color: var(--gold-light);
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .students-list {
+            color: var(--gold-primary);
+            font-weight: 700;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            background: var(--btn-orange);
+            color: #FFFFFF;
+            border: none;
+            outline: none;
+            padding: 14px 36px;
+            border-radius: 30px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(245, 124, 0, 0.5),
+                        0 0 15px rgba(255, 152, 0, 0.4);
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 3px 10px rgba(245, 124, 0, 0.4);
+        }
+
+        /* Stage Containers */
+        .stage-view {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .stage-view.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Diya / Oil Lamp Component for Stage 3 */
+        .diya-container {
+            margin: 25px 0 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .diya-flame {
+            width: 22px;
+            height: 36px;
+            background: linear-gradient(to top, #FF3D00, #FFEA00, #FFFFFF);
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 20px #FFEA00, 0 0 40px #FF9100;
+            opacity: 0;
+            transform: scale(0.3);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center bottom;
+        }
+
+        .diya-flame.lit {
+            opacity: 1;
+            transform: scale(1);
+            animation: flicker 0.15s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-1deg); }
+            100% { transform: scale(1.08) rotate(1deg); }
+        }
+
+        .diya-base {
+            width: 110px;
+            height: 45px;
+            background: linear-gradient(135deg, #D87A2B, #8C3E00);
+            border-radius: 0 0 60px 60px;
+            position: relative;
+            border-top: 5px solid #F5A623;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+
+        .diya-base::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 8px;
+            background: #F5A623;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Glowing Light Canvas Background -->
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="app-container">
+
+        <!-- STAGE 1 OF 5 -->
+        <div class="stage-view active" id="stage1">
+            <div class="stage-pill">Stage 1 of 5</div>
+            <div class="stage-header">
+                <div class="title-primary">🌸 SPECIAL TRIBUTE 🌸</div>
+                <div class="title-secondary">Jhantu Mondal Sir</div>
+            </div>
+            <div class="main-card">
+                <div class="card-heading">Respected Sir,</div>
+                <div class="card-text">
+                    <p>Today is a very special day to celebrate the person who lights the path of knowledge and guides us towards success! ✨</p>
+                </div>
+            </div>
+            <button class="action-btn" onclick="goToStage(2)">Tap to Launch Rockets 🚀</button>
+        </div>
+
+        <!-- STAGE 2 OF 5 (ROCKET BLAST CELEBRATION) -->
+        <div class="stage-view" id="stage2">
+            <div class="stage-pill">Stage 2 of 5</div>
+            <div class="stage-header">
+                <div class="title-primary">🚀 LAUNCHING CELEBRATION...</div>
+            </div>
+            <div class="main-card">
+                <div class="card-text">
+                    <p>Watch the rockets fly up and blast across the sky! 🎉</p>
+                </div>
+            </div>
+            <button class="action-btn" id="fireBtn" onclick="triggerFireworks()">Fire Rockets! 💥</button>
+        </div>
+
+        <!-- STAGE 2.5 (GRATITUDE MESSAGE) -->
+        <div class="stage-view" id="stage2_sub">
+            <div class="stage-pill">Stage 2 of 5</div>
+            <div class="stage-header">
+                <div class="title-primary">🌸 HAPPY TEACHER'S DAY 🌸</div>
+                <div class="title-secondary">Jhantu Mondal Sir</div>
+            </div>
+            <div class="main-card">
+                <div class="card-text">
+                    <p>On this beautiful occasion, we want to express our deepest respect and gratitude to you for guiding our lives! ✨</p>
+                </div>
+            </div>
+            <button class="action-btn" onclick="goToStage(3)">Continue ➡️</button>
+        </div>
+
+        <!-- STAGE 3 OF 5 (DIYAM / LAMP LIGHTING) -->
+        <div class="stage-view" id="stage3">
+            <div class="stage-pill">Stage 3 of 5</div>
+            <div class="stage-header">
+                <div class="title-primary">THE GUIDING LAMP</div>
+                <div class="title-secondary">Light the Lamp 🕯️</div>
+            </div>
+            <div class="main-card">
+                <div class="card-text">
+                    <p>A teacher is like a lamp that removes the darkness of ignorance and shows the way to a brighter future.</p>
+                    <p style="font-weight: 600; color: var(--gold-light); margin-top: 10px;">Tap the diya below to light the flame!</p>
+                </div>
+                
+                <div class="diya-container" onclick="lightDiya()">
+                    <div class="diya-flame" id="diyaFlame"></div>
+                    <div class="diya-base"></div>
+                </div>
+            </div>
+            <button class="action-btn" onclick="goToStage(4)">Next Stage ➡️</button>
+        </div>
+
+        <!-- STAGE 4 OF 5 (LIFE LESSONS) -->
+        <div class="stage-view" id="stage4">
+            <div class="stage-pill">Stage 4 of 5</div>
+            <div class="stage-header">
+                <div class="title-primary">LIFE LESSONS</div>
+                <div class="title-secondary">Beyond Textbooks 📚</div>
+            </div>
+            <div class="main-card">
+                <div class="card-text">
+                    <p>The lessons you teach us are not limited to textbooks. You teach us the values of honesty, discipline, confidence, and hard work — qualities that will help us throughout our lives.</p>
+                    <p>Whenever we face difficulties, your words of encouragement give us the strength to move forward.</p>
+                </div>
+            </div>
+            <button class="action-btn" onclick="goToStage(5)">View Final Wish 💌</button>
+        </div>
+
+        <!-- STAGE 5 OF 5 (FINAL WISH NOTE) -->
+        <div class="stage-view" id="stage5">
+            <div class="stage-pill">Stage 5 of 5</div>
+            <div class="stage-header">
+                <div class="title-primary">🌺 HAPPY TEACHER'S DAY 🌺</div>
+                <div class="title-secondary">Jhantu Mondal Sir</div>
+            </div>
+            <div class="main-card">
+                <div class="card-text">
+                    <p>Sir, your efforts may not always be seen, but they are always remembered. Every achievement we make will carry a small part of your guidance and support.</p>
+                    <p>On this Teacher's Day, we promise to respect your teachings and try our best to make you proud. May you always have good health, happiness, and endless success!</p>
+                    <p>Thank you, Sir, for being the reason behind our growth and confidence.</p>
+                </div>
+                
+                <div class="signature-box">
+                    <div class="signature-title">With love, respect, and gratitude,<br>Your Students:</div>
+                    <div class="students-list">
+                        Arghyadeep | Partha | Devkumar |<br>Anshuman | Agnik | Sangita
+                    </div>
+                </div>
+            </div>
+            <button class="action-btn" onclick="goToStage(1)">Replay Celebration 🔄</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- STAGE NAVIGATION LOGIC ---
+        function goToStage(stageNum) {
+            document.querySelectorAll('.stage-view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            if (stageNum === 2) {
+                document.getElementById('stage2').classList.add('active');
+            } else if (stageNum === 3) {
+                document.getElementById('stage3').classList.add('active');
+            } else if (stageNum === 4) {
+                document.getElementById('stage4').classList.add('active');
+            } else if (stageNum === 5) {
+                document.getElementById('stage5').classList.add('active');
+                // Celebrate final stage with light confetti
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            } else if (stageNum === 1) {
+                document.getElementById('stage1').classList.add('active');
+            }
+        }
+
+        // --- FIREWORKS / ROCKET LAUNCH EFFECT (STAGE 2) ---
+        function triggerFireworks() {
+            const duration = 2.5 * 1000;
+            const animationEnd = Date.now() + duration;
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    // Automatically proceed to sub-stage
+                    document.getElementById('stage2').classList.remove('active');
+                    document.getElementById('stage2_sub').classList.add('active');
+                    return;
+                }
+
+                // Random rocket positions across screen
+                confetti({
+                    particleCount: 40,
+                    startVelocity: 45,
+                    spread: 360,
+                    ticks: 90,
+                    origin: {
+                        x: Math.random(),
+                        y: Math.random() * 0.5 + 0.2
+                    }
+                });
+            }, 300);
+        }
+
+        // --- DIYA LIGHTING LOGIC (STAGE 3) ---
+        function lightDiya() {
+            const flame = document.getElementById('diyaFlame');
+            flame.classList.add('lit');
+            confetti({ particleCount: 25, spread: 40, origin: { y: 0.6 } });
+        }
+
+        // --- AMBIENT RISING GLOWING PARTICLES CANVAS ---
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const colors = ['#00E676', '#FFEA00', '#FF2979', '#00E5FF', '#FF9100'];
+        const particles = [];
+
+        for (let i = 0; i < 35; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 6 + 3,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speedY: Math.random() * 1.5 + 0.5,
+                alpha: Math.random() * 0.7 + 0.3
+            });
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                p.y -= p.speedY;
+                if (p.y < -10) {
+                    p.y = canvas.height + 10;
+                    p.x = Math.random() * canvas.width;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = p.color;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+</body>
+</html>
